@@ -1,13 +1,21 @@
 module EditDistance exposing ( levenshtein )
 
-{-| A package for calculating between-list edit distances.
+{-|  The EditDistance module allows for calculating the Levenshtein distance
+between two lists.
+
+# Edit Distance
+@docs levenshtein
 -}
 
 {-| Calculate the Levenshtein distance between two lists, i.e. how many
 insertions, deletions or substitutions are required to turn one given list into
 another.
+
+    levenshtein (toList "kitten") (toList "sitting") == 3
+    levenshtein (toList "preterit") (toList "zeitgeist") == 6
+    levenshtein (toList "garvey") (toList "avery") == 3
 -}
-levenshtein : List comparable -> List comparable -> Int
+levenshtein : List a -> List a -> Int
 levenshtein source target =
   case (source, target) of
     (source, []) -> List.length source
