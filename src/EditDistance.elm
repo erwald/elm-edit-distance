@@ -20,12 +20,12 @@ type alias EditSteps a = List (EditStep a)
 {-| Calculate the minimal steps (insertions, deletions, moves and substitutions)
 required to turn one given list into another.
 
-    edits (toList "kitten") (toList "sitting") ==
+    edits (String.toList "kitten") (String.toList "sitting") ==
       [ Substitute 's' 0
       , Substitute 'i' 4
       , Insert 'g' 6
       ]
-    edits (toList "garvey") (toList "avery") ==
+    edits (String.toList "garvey") (String.toList "avery") ==
       [ Delete 'g' 0
       , Move 'r' 2 3
       ]
@@ -160,9 +160,9 @@ moveFromSteps editSteps step =
 insertions, deletions or substitutions are required to turn one given list into
 another.
 
-    levenshtein (toList "kitten") (toList "sitting") == 3
-    levenshtein (toList "preterit") (toList "zeitgeist") == 6
-    levenshtein (toList "garvey") (toList "avery") == 3
+    levenshtein (String.toList "kitten") (String.toList "sitting") == 3
+    levenshtein (String.toList "preterit") (String.toList "zeitgeist") == 6
+    levenshtein (String.toList "garvey") (String.toList "avery") == 3
 -}
 levenshtein : List a -> List a -> Int
 levenshtein source target =

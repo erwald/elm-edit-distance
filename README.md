@@ -1,3 +1,55 @@
 # Edit Distance
 
 An Elm package for calculating between-list edit distances.
+
+It can calculate both the [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance) between two lists and the actual edit steps required to go from one list to another (using the [Wagner-Fischer algorithm](https://en.wikipedia.org/wiki/Wagner%E2%80%93Fischer_algorithm)).
+
+
+```elm
+-- Levenshtein.
+levenshtein (String.toList "kitten") (String.toList "sitting") == 3
+levenshtein (String.toList "preterit") (String.toList "zeitgeist") == 6
+levenshtein (String.toList "garvey") (String.toList "avery") == 3
+
+-- Edit steps.
+edits (String.toList "kitten") (String.toList "sitting") ==
+  [ Substitute 's' 0
+  , Substitute 'i' 4
+  , Insert 'g' 6
+  ]
+
+edits (String.toList "sitting") (String.toList "kitten") ==
+  [ Substitute 'k' 0
+  , Substitute 'e' 4
+  , Delete 'g' 6
+  ]
+
+-- Edit steps include moves (i.e. deletions followed by insertions).
+edits (String.toList "garvey") (String.toList "avery") ==
+  [ Delete 'g' 0
+  , Move 'r' 2 3
+  ]
+```
+
+The resulting indices reflect edits where *deletions are made first*, before insertions and substitutions. That is, indices for deletions refer to the source list, whereas indices for insertions and substitutions refer to the latter, intermediate lists.
+
+An example will serve. Calling `edits` with `String.toList "preterit"` and `String.toList "zeitgeist"` returns the following:
+
+```elm
+[ Substitute 'z' 0
+, Delete 'r' 1
+, Insert 'i' 2
+, Insert 'g' 4
+, Delete 'r' 5
+, Insert 's' 7
+]
+```
+
+Let's look at these steps in order, keeping in mind that deletions are made first:
+
+1. Deleting at index 1 in "p**r**eterit" gives "peterit".
+2. Deleting at index 5 in "prete**r**it" gives "peteit".
+3. Substituting "z" at index 0 in "**p**eteit" gives "**z**eteit".
+4. Inserting "i" at index 2 in "zeteit" gives "ze**i**teit".
+5. Inserting "g" at index 4 in "zeiteit" gives "zeit**g**eit".
+6. Inserting "s" at index 7 in "zeitgeit" gives "zeitgei**s**t".
