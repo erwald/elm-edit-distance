@@ -6,9 +6,13 @@ It can calculate both the [Levenshtein distance](https://en.wikipedia.org/wiki/L
 
 
 ```elm
+kitten = (String.toList "kitten")
+sitting = (String.toList "sitting")
+garvey = (String.toList "garvey")
+avery = (String.toList "avery")
+
 -- Levenshtein.
 levenshtein (String.toList "kitten") (String.toList "sitting") == 3
-levenshtein (String.toList "preterit") (String.toList "zeitgeist") == 6
 levenshtein (String.toList "garvey") (String.toList "avery") == 3
 
 -- Edit steps.
@@ -53,3 +57,32 @@ Let's look at these steps in order, keeping in mind that deletions are made firs
 4. Inserting "i" at index 2 in "zeteit" gives "ze**i**teit".
 5. Inserting "g" at index 4 in "zeiteit" gives "zeit**g**eit".
 6. Inserting "s" at index 7 in "zeitgeit" gives "zeitgei**s**t".
+
+## Tests
+
+Run tests:
+
+```sh
+$ cd tests
+
+$ elm-make Tests.elm
+Success! Compiled 0 modules.
+Successfully generated index.html
+```
+
+Then open up `index.html` and have a look at the console. It should say something like this:
+
+```
+1 suites run, containing 14 tests
+All tests passed
+```
+
+## Contributing
+
+Contributions are welcome. Just open up an issue if you've found a problem or have a suggestion for a feature, or a pull request if you already know how to fix or implement it.
+
+## Changelog
+
+### 0.1.0
+
+* Initial version, with support for calculating Levenshtein distance and edit steps with the Wagner-Fischer algorithm.
