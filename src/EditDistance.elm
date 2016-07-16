@@ -25,7 +25,55 @@ required to turn one given list into another.
 
 edits : List a -> List a -> List (Change a)
 edits source target =
-  []
+  let
+    (result, _) = doEdits (List.reverse source) (List.reverse target)
+  in
+    List.reverse result
+
+doEdits : List a -> List a -> (List (Change a), Int)
+doEdits source target =
+  case (source, target) of
+    ([], []) ->
+      ([], 0)
+
+    (src_hd::src_tail, []) ->
+      let
+        edit = Delete src_hd (List.length src_tail)
+        (result, cost) = doEdits src_tail []
+      in
+        (edit :: result, cost + 1)
+
+    ([], tgt_hd::tgt_tail) ->
+      let
+        edit = Insert tgt_hd (List.length tgt_tail)
+        (result, cost) = doEdits tgt_tail []
+      in
+        (edit :: result, cost + 1)
+
+    (src_hd::src_tail, tgt_hd::tgt_tail) ->
+      if src_hd == tgt_hd then
+        doEdits src_tail tgt_tail
+      else
+        let
+          results =
+            [ doEdits src_tail (tgt_hd :: tgt_tail)
+            , doEdits (src_hd :: src_tail) tgt_tail
+            , doEdits src_tail tgt_tail
+            ]
+          edits =
+            [ Delete src_hd (List.length src_tail)
+            , Insert tgt_hd (List.length tgt_tail)
+            , Substitute tgt_hd (List.length tgt_tail)
+            ]
+          combineResultsWithEdits (res, cost) edit =
+            (edit :: res, cost + 1)
+          getCost (_, cost) =
+            cost
+        in
+          List.map2 combineResultsWithEdits results edits
+            |> List.sortBy getCost
+            |> List.head
+            |> Maybe.withDefault ([], 0)
 
 {-| Calculate the Levenshtein distance between two lists, i.e. how many
 insertions, deletions or substitutions are required to turn one given list into
@@ -38,14 +86,18 @@ another.
 levenshtein : List a -> List a -> Int
 levenshtein source target =
   case (source, target) of
-    (source, []) -> List.length source
-    ([], target) -> List.length target
-    (src_hd::src_rest, tgt_hd::tgt_rest) ->
+    (source, []) ->
+      List.length source
+
+    ([], target) ->
+      List.length target
+
+    (src_hd::src_tail, tgt_hd::tgt_tail) ->
       if src_hd == tgt_hd then
-        levenshtein src_rest tgt_rest
+        levenshtein src_tail tgt_tail
       else
         Maybe.withDefault 0 (List.minimum
-          [ (levenshtein src_rest target) + 1
-          , (levenshtein source tgt_rest) + 1
-          , (levenshtein src_rest tgt_rest) + 1
+          [ (levenshtein src_tail target) + 1
+          , (levenshtein source tgt_tail) + 1
+          , (levenshtein src_tail tgt_tail) + 1
           ])
