@@ -1,11 +1,30 @@
-module EditDistance exposing ( levenshtein )
+module EditDistance exposing ( Change, edits, levenshtein )
 
 {-|  The EditDistance module allows for calculating the Levenshtein distance
 between two lists.
 
 # Edit Distance
-@docs levenshtein
+@docs Change, edits, levenshtein
 -}
+
+{-| Describes an edit step used to go from one list to another. -}
+type Change a
+  = Insertion a Int
+  | Deletion a Int
+  | Move a Int Int
+
+{-| Calculate the minimal steps (insertions, deletions and moves) required to
+turn one given list into another.
+
+    edits (toList "preterit") (toList "zeitgeist") ==
+      [ Delete "g" 0
+      , Move "r" 2 0
+      ]
+-}
+
+edits : List a -> List a -> List Change
+edits source target =
+  []
 
 {-| Calculate the Levenshtein distance between two lists, i.e. how many
 insertions, deletions or substitutions are required to turn one given list into
