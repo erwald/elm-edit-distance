@@ -5,9 +5,8 @@ import ElmTest exposing (..)
 
 import EditDistance exposing ( levenshtein )
 
-tests : Test
-tests =
-  suite "Edit Distance tests"
+levenshtein_tests : List Test
+levenshtein_tests =
     [ test "kitten -> sitting levenshtein distance" (assertEqual (levenshtein (toList "kitten") (toList "sitting")) 3)
     , test "sitting -> kitten levenshtein distance" (assertEqual (levenshtein (toList "sitting") (toList "kitten")) 3)
     , test "preterit -> zeitgeist levenshtein distance" (assertEqual (levenshtein (toList "preterit") (toList "zeitgeist")) 6)
@@ -16,6 +15,17 @@ tests =
     , test "avery -> garvey levenshtein distance" (assertEqual (levenshtein (toList "avery") (toList "garvey")) 3)
     ]
 
+all_tests : Test
+all_tests =
+  let
+    tests =
+      List.concat
+        [ levenshtein_tests
+        ]
+  in
+    suite "Edit Distance tests" tests
+
+
 main : Program Never
 main =
-  runSuite tests
+  runSuite all_tests
