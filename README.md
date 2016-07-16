@@ -60,7 +60,7 @@ Let's look at these steps in order, keeping in mind that deletions are made firs
 
 ## Tests
 
-Run tests:
+First compile the tests:
 
 ```sh
 $ cd tests
@@ -85,4 +85,4 @@ Contributions are welcome. Just open up an issue if you've found a problem or ha
 
 ### 0.1.0
 
-* Initial version, with support for calculating Levenshtein distance and edit steps with the Wagner-Fischer algorithm.
+* Initial version, with support for calculating Levenshtein distance and edit steps using the Wagner-Fischer algorithm.
