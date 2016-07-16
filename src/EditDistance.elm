@@ -7,7 +7,8 @@ between two lists.
 @docs EditStep, edits, levenshtein
 -}
 
-{-| Describes an edit step used to go from one list to another. -}
+{-| Describes an edit step used to go from one list to another.
+-}
 type EditStep a
   = Insert a Int
   | Delete a Int
@@ -37,7 +38,7 @@ edits source target =
     List.reverse result
       |> reduceMoves
 
-{- Helper for edits function. -}
+{-| Helper for edits function. -}
 doEdits : List a -> List a -> (EditSteps a, Int)
 doEdits source target =
   case (source, target) of
@@ -54,7 +55,7 @@ doEdits source target =
     ([], tgt_hd::tgt_tail) ->
       let
         edit = Insert tgt_hd (List.length tgt_tail)
-        (result, cost) = doEdits tgt_tail []
+        (result, cost) = doEdits [] tgt_tail
       in
         (edit :: result, cost + 1)
 
@@ -97,14 +98,16 @@ reduceMoves editSteps =
         Nothing -> acc ++ [step]
 
     {- Takes an element and a list and returns the list with the element added
-    if it wasn't already in the list. -}
+    if it wasn't already in the list.
+    -}
     addElementIfUnique elem list =
       if (List.member elem list) then
         list
       else
         list ++ [elem]
 
-    {- Takes a list and returns it with any duplicate elements removed. -}
+    {- Takes a list and returns it with any duplicate elements removed.
+    -}
     dropDuplicates list =
       List.foldl addElementIfUnique [] list
   in
@@ -112,7 +115,7 @@ reduceMoves editSteps =
       |> List.foldl findMove []
       |> dropDuplicates
 
-{- Takes an edit step and a list of edit steps and returns either a move step
+{-| Takes an edit step and a list of edit steps and returns either a move step
 if there is one to be found for that edit step, or Nothing if not.
 -}
 moveFromSteps : EditSteps a -> EditStep a -> Maybe (EditStep a)
@@ -120,7 +123,7 @@ moveFromSteps editSteps step =
   case step of
     Insert value index ->
       let
-        {- Find the other corresponding deletion, if there is one. -}
+        -- Find the corresponding deletion, if there is one.
         isCorrespondingDelete step =
           case step of
             Delete otherValue _ -> value == otherValue
@@ -136,7 +139,7 @@ moveFromSteps editSteps step =
 
     Delete value index ->
       let
-        {- Find the other corresponding insertion, if there is one. -}
+        -- Find the corresponding insertion, if there is one.
         isCorrespondingInsert step =
           case step of
             Insert otherValue _ -> value == otherValue
