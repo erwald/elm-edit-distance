@@ -58,6 +58,12 @@ Let's look at these steps in order, keeping in mind that deletions are made firs
 5. Inserting "g" at index 4 in "zeiteit" gives "zeit**g**eit".
 6. Inserting "s" at index 7 in "zeitgeit" gives "zeitgei**s**t".
 
+## To do
+
+[ ] String support.
+[ ] Custom cost function.
+[ ] Memoization.
+
 ## Tests
 
 First compile the tests:
