@@ -60,9 +60,9 @@ Let's look at these steps in order, keeping in mind that deletions are made firs
 
 ## To do
 
-[ ] String support.
-[ ] Custom cost function.
-[ ] Memoization.
+* [ ] String support.
+* [ ] Custom cost function.
+* [ ] Memoization.
 
 ## Tests
 
