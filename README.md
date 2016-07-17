@@ -6,14 +6,9 @@ It can calculate both the [Levenshtein distance](https://en.wikipedia.org/wiki/L
 
 
 ```elm
-kitten = (String.toList "kitten")
-sitting = (String.toList "sitting")
-garvey = (String.toList "garvey")
-avery = (String.toList "avery")
-
 -- Levenshtein.
 levenshtein (String.toList "kitten") (String.toList "sitting") == 3
-levenshtein (String.toList "garvey") (String.toList "avery") == 3
+levenshteinFromStrings "garvey" "avery" == 3
 
 -- Edit steps.
 edits (String.toList "kitten") (String.toList "sitting") ==
@@ -22,14 +17,14 @@ edits (String.toList "kitten") (String.toList "sitting") ==
   , Insert 'g' 6
   ]
 
-edits (String.toList "sitting") (String.toList "kitten") ==
+editsFromStrings "sitting" "kitten" ==
   [ Substitute 'k' 0
   , Substitute 'e' 4
   , Delete 'g' 6
   ]
 
 -- Edit steps include moves (i.e. deletions followed by insertions).
-edits (String.toList "garvey") (String.toList "avery") ==
+editsFromStrings "garvey" "avery" ==
   [ Delete 'g' 0
   , Move 'r' 2 3
   ]
@@ -37,7 +32,7 @@ edits (String.toList "garvey") (String.toList "avery") ==
 
 The resulting indices reflect edits where *deletions are made first*, before insertions and substitutions. That is, indices for deletions refer to the source list, whereas indices for insertions and substitutions refer to the latter, intermediate lists.
 
-An example will serve. Calling `edits` with `String.toList "preterit"` and `String.toList "zeitgeist"` returns the following:
+An example will serve. Calling `editsFromStrings` with `"preterit"` and `"zeitgeist"` returns the following:
 
 ```elm
 [ Substitute 'z' 0
@@ -60,7 +55,7 @@ Let's look at these steps in order, keeping in mind that deletions are made firs
 
 ## To do
 
-* [ ] String support.
+* [x] String support.
 * [ ] Custom cost function.
 * [ ] Memoization.
 

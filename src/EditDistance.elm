@@ -1,12 +1,15 @@
-module EditDistance exposing ( EditStep (..), edits, levenshtein )
+module EditDistance exposing ( EditStep (..), edits, editsFromStrings,
+  levenshtein, levenshteinFromStrings )
 
 {-|  The EditDistance module allows for calculating the Levenshtein distance
 between two lists, or the actual edit steps required to go from one to the
 other.
 
 # Edit Distance
-@docs EditStep, edits, levenshtein
+@docs EditStep, edits, editsFromStrings, levenshtein, levenshteinFromStrings
 -}
+
+import String exposing (toList)
 
 {-| Describes an edit step used to go from one list to another.
 -}
@@ -16,13 +19,8 @@ type EditStep a
   | Substitute a Int
   | Move a Int Int
 
-{-| Calculate the minimal steps (insertions, deletions, moves and substitutions)
+{-| Calculate the minimum steps (insertions, deletions, moves and substitutions)
 required to turn one given list into another.
-
-The resulting indices reflect edits where _deletions are made first_, before
-insertions and substitutions. That is, indices for deletions refer to the source
-list, whereas indices for insertions and substitutions refer to the latter,
-intermediate lists.
 
     edits (String.toList "kitten") (String.toList "sitting") ==
       [ Substitute 's' 0
@@ -34,6 +32,11 @@ intermediate lists.
       [ Delete 'g' 0
       , Move 'r' 2 3
       ]
+
+The resulting indices reflect edits where _deletions are made first_, before
+insertions and substitutions. That is, indices for deletions refer to the source
+list, whereas indices for insertions and substitutions refer to the latter,
+intermediate lists.
 -}
 edits : List comparable -> List comparable -> List (EditStep comparable)
 edits source target =
@@ -161,9 +164,26 @@ moveFromSteps editSteps step =
     _ ->
       Nothing
 
+{-| Same as the `edits` function, but for String values.
+
+    editsFromStrings "kitten" "sitting" ==
+      [ Substitute 's' 0
+      , Substitute 'i' 4
+      , Insert 'g' 6
+      ]
+
+    editsFromStrings "garvey" "avery" ==
+      [ Delete 'g' 0
+      , Move 'r' 2 3
+      ]
+-}
+editsFromStrings : String -> String -> List (EditStep Char)
+editsFromStrings source target =
+  edits (String.toList source) (String.toList target)
+
 {-| Calculate the Levenshtein distance between two lists, i.e. how many
-insertions, deletions or substitutions are required to turn one given list into
-another.
+insertions, deletions or substitutions are required to turn one given list
+into another.
 
     levenshtein (String.toList "kitten") (String.toList "sitting")
       == 3
@@ -192,3 +212,15 @@ levenshtein source target =
           , (levenshtein source tgt_tail) + 1
           , (levenshtein src_tail tgt_tail) + 1
           ])
+
+{-| Same as the `levenshtein` function, but for String values.
+
+    levenshtein "kitten" "sitting" == 3
+
+    levenshtein "preterit" "zeitgeist" == 6
+
+    levenshtein "garvey" "avery" == 3
+-}
+levenshteinFromStrings : String -> String -> Int
+levenshteinFromStrings source target =
+  levenshtein (String.toList source) (String.toList target)

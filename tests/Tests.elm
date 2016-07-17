@@ -3,7 +3,8 @@ module Tests exposing (..)
 import String exposing (toList)
 import ElmTest exposing (..)
 
-import EditDistance exposing ( EditStep (..), edits, levenshtein )
+import EditDistance exposing ( EditStep (..), edits, editsFromStrings,
+  levenshtein, levenshteinFromStrings )
 
 -- Setup
 
@@ -25,10 +26,10 @@ preterit = (toList "preterit")
 zeitgeist : List Char
 zeitgeist = (toList "zeitgeist")
 
--- Tests for the edits function.
+-- Tests for the edits functions.
 
-edits_tests : List Test
-edits_tests =
+editsTests : List Test
+editsTests =
   [ test "kitten -> sitting edit steps" (
       assertEqual (edits kitten sitting) (
         [ Substitute 's' 0
@@ -105,27 +106,87 @@ edits_tests =
     )
   ]
 
--- Tests for the levenshtein function.
+editsFromStringsTests : List Test
+editsFromStringsTests =
+  [ test "preterit -> zeitgeist (as String values) edit steps" (
+      assertEqual (editsFromStrings "preterit" "zeitgeist") (
+        [ Substitute 'z' 0
+        , Delete 'r' 1
+        , Insert 'i' 2
+        , Insert 'g' 4
+        , Delete 'r' 5
+        , Insert 's' 7
+        ]
+      )
+    )
+  , test "zeitgeist -> preterit (as String values) edit steps" (
+      assertEqual (editsFromStrings "zeitgeist" "preterit") (
+        [ Substitute 'p' 0
+        , Insert 'r' 1
+        , Delete 'i' 2
+        , Delete 'g' 4
+        , Insert 'r' 5
+        , Delete 's' 7
+        ]
+      )
+    )
+  , test "kitten -> empty string (as String values) edit steps" (
+      assertEqual (editsFromStrings "kitten" "") (
+        [ Delete 'k' 0
+        , Delete 'i' 1
+        , Delete 't' 2
+        , Delete 't' 3
+        , Delete 'e' 4
+        , Delete 'n' 5
+        ]
+      )
+    )
+  , test "empty string -> kitten (as String values) edit steps" (
+      assertEqual (editsFromStrings "" "kitten") (
+        [ Insert 'k' 0
+        , Insert 'i' 1
+        , Insert 't' 2
+        , Insert 't' 3
+        , Insert 'e' 4
+        , Insert 'n' 5
+        ]
+      )
+    )
+  ]
 
-levenshtein_tests : List Test
-levenshtein_tests =
-    [ test "kitten -> sitting levenshtein distance" (assertEqual (levenshtein kitten sitting) 3)
-    , test "sitting -> kitten levenshtein distance" (assertEqual (levenshtein sitting kitten) 3)
-    , test "preterit -> zeitgeist levenshtein distance" (assertEqual (levenshtein preterit zeitgeist) 6)
-    , test "zeitgeist -> preterit levenshtein distance" (assertEqual (levenshtein zeitgeist preterit) 6)
-    , test "garvey -> avery levenshtein distance" (assertEqual (levenshtein garvey avery) 3)
-    , test "avery -> garvey levenshtein distance" (assertEqual (levenshtein avery garvey) 3)
+-- Tests for the levenshtein functions.
+
+levenshteinTests : List Test
+levenshteinTests =
+    [ test "kitten <-> sitting levenshtein distance" (assertEqual (levenshtein kitten sitting) 3)
+    , test "sitting <-> kitten levenshtein distance" (assertEqual (levenshtein sitting kitten) 3)
+    , test "preterit <-> zeitgeist levenshtein distance" (assertEqual (levenshtein preterit zeitgeist) 6)
+    , test "zeitgeist <-> preterit levenshtein distance" (assertEqual (levenshtein zeitgeist preterit) 6)
+    , test "garvey <-> avery levenshtein distance" (assertEqual (levenshtein garvey avery) 3)
+    , test "avery <-> garvey levenshtein distance" (assertEqual (levenshtein avery garvey) 3)
+    , test "kitten <-> empty string levenshtein distance" (assertEqual (levenshtein kitten []) 6)
+    , test "empty string <-> kitten levenshtein distance" (assertEqual (levenshtein [] kitten) 6)
+    ]
+
+levenshteinFromStringsTests : List Test
+levenshteinFromStringsTests =
+    [ test "kitten <-> sitting (as String values) levenshtein distance" (assertEqual (levenshteinFromStrings "kitten" "sitting") 3)
+    , test "sitting <-> kitten (as String values) levenshtein distance" (assertEqual (levenshteinFromStrings "sitting" "kitten") 3)
+    , test "kitten <-> empty string (as String values) levenshtein distance" (assertEqual (levenshteinFromStrings "kitten" "") 6)
+    , test "empty string <-> kitten (as String values) levenshtein distance" (assertEqual (levenshteinFromStrings "" "kitten") 6)
     ]
 
 -- Test execution.
 
-all_tests : Test
-all_tests =
+allTests : Test
+allTests =
   let
     tests =
       List.concat
-        [ edits_tests
-        , levenshtein_tests
+        [ editsTests
+        , editsFromStringsTests
+        , levenshteinTests
+        , levenshteinFromStringsTests
         ]
   in
     suite "Edit Distance Tests" tests
@@ -133,4 +194,4 @@ all_tests =
 
 main : Program Never
 main =
-  runSuite all_tests
+  runSuite allTests
