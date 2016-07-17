@@ -56,7 +56,7 @@ Let's look at these steps in order, keeping in mind that deletions are made firs
 ## To do
 
 * [x] String support.
-* [ ] Custom cost function.
+* [x] Custom cost function.
 * [ ] Memoization.
 
 ## Tests

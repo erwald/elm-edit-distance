@@ -1,15 +1,16 @@
-module EditDistance exposing ( EditStep (..), edits, editsFromStrings,
-  levenshtein, levenshteinFromStrings )
+module EditDistance exposing ( EditStep (..), edits, editsWithCostFunc,
+  editsFromStrings, editsWithCostFuncFromStrings, levenshtein,
+  levenshteinFromStrings )
 
 {-|  The EditDistance module allows for calculating the Levenshtein distance
 between two lists, or the actual edit steps required to go from one to the
 other.
 
-# Edit Distance
-@docs EditStep, edits, levenshtein
+# Edit Steps
+@docs EditStep, edits, editsFromStrings, editsWithCostFunc, editsWithCostFuncFromStrings
 
-# Convenience Functions
-@docs editsFromStrings, levenshteinFromStrings
+# Levenshtein
+@docs levenshtein, levenshteinFromStrings
 
 -}
 
@@ -44,15 +45,43 @@ intermediate lists.
 -}
 edits : List comparable -> List comparable -> List (EditStep comparable)
 edits source target =
+  editsWithCostFunc (\_ -> 1) source target
+
+{-| Same as `edits`, but also takes a custom cost function, which takes an
+EditStep (of type Insert, Delete or Substitute) and returns a cost (i.e. an
+Int).
+
+    edits (String.toList "abc") (String.toList "adc") ==
+      [ Substitute 'd' 1
+      ]
+
+    -- Make substitutions more costly.
+    costFunc editStep =
+      case editStep of
+        Substitute _ _ -> 3
+        _ -> 1
+
+    -- Substitutions are replaced by insertions and deletions.
+    editsWithCostFunc costFunc (String.toList "abc") (String.toList "adc") ==
+      [ Insert 'd' 1
+      , Delete 'b' 1
+      ]
+
+(Note that the cost function is applied _before_ insertions and deletions are
+converted into moves, meaning it will never receive an EditStep of type Move as
+an argument.)
+-}
+editsWithCostFunc : (EditStep comparable -> Int) -> List comparable -> List comparable -> List (EditStep comparable)
+editsWithCostFunc costFunc source target =
   let
-    (result, _) = doEdits (List.reverse source) (List.reverse target)
+    (result, _) = doEdits costFunc (List.reverse source) (List.reverse target)
   in
     List.reverse result
       |> reduceMoves
 
 {-| Helper for edits function. -}
-doEdits : List comparable -> List comparable -> (List (EditStep comparable), Int)
-doEdits source target =
+doEdits : (EditStep comparable -> Int) -> List comparable -> List comparable -> (List (EditStep comparable), Int)
+doEdits costFunc source target =
   case (source, target) of
     ([], []) ->
       ([], 0)
@@ -60,26 +89,26 @@ doEdits source target =
     (src_hd::src_tail, []) ->
       let
         edit = Delete src_hd (List.length src_tail)
-        (result, cost) = doEdits src_tail []
+        (result, cost) = doEdits costFunc src_tail []
       in
-        (edit :: result, cost + 1)
+        (edit :: result, cost + (costFunc edit))
 
     ([], tgt_hd::tgt_tail) ->
       let
         edit = Insert tgt_hd (List.length tgt_tail)
-        (result, cost) = doEdits [] tgt_tail
+        (result, cost) = doEdits costFunc [] tgt_tail
       in
-        (edit :: result, cost + 1)
+        (edit :: result, cost + (costFunc edit))
 
     (src_hd::src_tail, tgt_hd::tgt_tail) ->
       if src_hd == tgt_hd then
-        doEdits src_tail tgt_tail
+        doEdits costFunc src_tail tgt_tail
       else
         let
           results =
-            [ doEdits src_tail (tgt_hd :: tgt_tail)
-            , doEdits (src_hd :: src_tail) tgt_tail
-            , doEdits src_tail tgt_tail
+            [ doEdits costFunc src_tail (tgt_hd :: tgt_tail)
+            , doEdits costFunc (src_hd :: src_tail) tgt_tail
+            , doEdits costFunc src_tail tgt_tail
             ]
           edits =
             [ Delete src_hd (List.length src_tail)
@@ -87,7 +116,7 @@ doEdits source target =
             , Substitute tgt_hd (List.length tgt_tail)
             ]
           combineResultsWithEdits (res, cost) edit =
-            (edit :: res, cost + 1)
+            (edit :: res, cost + (costFunc edit))
           getCost (_, cost) =
             cost
         in
@@ -184,6 +213,28 @@ moveFromSteps editSteps step =
 editsFromStrings : String -> String -> List (EditStep Char)
 editsFromStrings source target =
   edits (String.toList source) (String.toList target)
+
+{-| Same as the `editsWithCostFunc` function, but for String values.
+
+    editsFromStrings "abc" "adc" ==
+      [ Substitute 'd' 1
+      ]
+
+    -- Make substitutions more costly.
+    costFunc editStep =
+      case editStep of
+        Substitute _ -> 3
+        _ -> 1
+
+    -- Substitutions are replaced by insertions and deletions.
+    editsWithCostFuncFromStrings costFunc "abc" "adc" ==
+      [ Insert 'd' 1
+      , Delete 'b' 1
+      ]
+-}
+editsWithCostFuncFromStrings : (EditStep Char -> Int) -> String -> String -> List (EditStep Char)
+editsWithCostFuncFromStrings costFunc source target =
+  editsWithCostFunc costFunc (String.toList source) (String.toList target)
 
 {-| Calculate the Levenshtein distance between two lists, i.e. how many
 insertions, deletions or substitutions are required to turn one given list

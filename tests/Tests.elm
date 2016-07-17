@@ -3,8 +3,8 @@ module Tests exposing (..)
 import String exposing (toList)
 import ElmTest exposing (..)
 
-import EditDistance exposing ( EditStep (..), edits, editsFromStrings,
-  levenshtein, levenshteinFromStrings )
+import EditDistance exposing ( EditStep (..), edits, editsWithCostFunc,
+  editsFromStrings, levenshtein, levenshteinFromStrings )
 
 -- Setup
 
@@ -25,6 +25,12 @@ preterit = (toList "preterit")
 
 zeitgeist : List Char
 zeitgeist = (toList "zeitgeist")
+
+abc : List Char
+abc = (toList "abc")
+
+adc : List Char
+adc = (toList "adc")
 
 -- Tests for the edits functions.
 
@@ -106,6 +112,29 @@ editsTests =
     )
   ]
 
+editsWithCostFuncTests : List Test
+editsWithCostFuncTests =
+  let
+    costFunc editStep =
+      case editStep of
+        Substitute _ _ -> 3
+        _ -> 1
+  in
+    [ test "abc -> adc (without cost function) edit steps" (
+        assertEqual (edits abc adc) (
+          [ Substitute 'd' 1
+          ]
+        )
+      )
+    , test "abc ~> adc cost function edit steps" (
+        assertEqual (editsWithCostFunc costFunc abc adc) (
+          [ Insert 'd' 1
+          , Delete 'b' 1
+          ]
+        )
+      )
+    ]
+
 editsFromStringsTests : List Test
 editsFromStringsTests =
   [ test "preterit -> zeitgeist (as String values) edit steps" (
@@ -184,6 +213,7 @@ allTests =
     tests =
       List.concat
         [ editsTests
+        , editsWithCostFuncTests
         , editsFromStringsTests
         , levenshteinTests
         , levenshteinFromStringsTests
