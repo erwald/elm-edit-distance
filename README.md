@@ -74,7 +74,7 @@ Successfully generated index.html
 Then open up `index.html` and have a look at the console. It should say something like this:
 
 ```
-1 suites run, containing 14 tests
+1 suites run, containing 26 tests
 All tests passed
 ```
 
