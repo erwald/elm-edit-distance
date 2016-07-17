@@ -84,6 +84,6 @@ Contributions are welcome. Just open up an issue if you've found a problem or ha
 
 ## Changelog
 
-### 0.1.0
+### 1.0.0
 
-* Initial version, with support for calculating Levenshtein distance and edit steps using the Wagner-Fischer algorithm.
+* Initial version, with support for calculating Levenshtein distance and edit steps using the Wagner-Fischer algorithm. Also includes String support.

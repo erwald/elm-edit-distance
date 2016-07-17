@@ -6,7 +6,11 @@ between two lists, or the actual edit steps required to go from one to the
 other.
 
 # Edit Distance
-@docs EditStep, edits, editsFromStrings, levenshtein, levenshteinFromStrings
+@docs EditStep, edits, levenshtein
+
+# Convenience Functions
+@docs editsFromStrings, levenshteinFromStrings
+
 -}
 
 import String exposing (toList)
