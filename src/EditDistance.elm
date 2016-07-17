@@ -1,7 +1,8 @@
 module EditDistance exposing ( EditStep (..), edits, levenshtein )
 
 {-|  The EditDistance module allows for calculating the Levenshtein distance
-between two lists.
+between two lists, or the actual edit steps required to go from one to the
+other.
 
 # Edit Distance
 @docs EditStep, edits, levenshtein
@@ -18,6 +19,11 @@ type EditStep a
 {-| Calculate the minimal steps (insertions, deletions, moves and substitutions)
 required to turn one given list into another.
 
+The resulting indices reflect edits where _deletions are made first_, before
+insertions and substitutions. That is, indices for deletions refer to the source
+list, whereas indices for insertions and substitutions refer to the latter,
+intermediate lists.
+
     edits (String.toList "kitten") (String.toList "sitting") ==
       [ Substitute 's' 0
       , Substitute 'i' 4
@@ -29,7 +35,7 @@ required to turn one given list into another.
       , Move 'r' 2 3
       ]
 -}
-edits : List a -> List a -> List (EditStep a)
+edits : List comparable -> List comparable -> List (EditStep comparable)
 edits source target =
   let
     (result, _) = doEdits (List.reverse source) (List.reverse target)
@@ -38,7 +44,7 @@ edits source target =
       |> reduceMoves
 
 {-| Helper for edits function. -}
-doEdits : List a -> List a -> (List (EditStep a), Int)
+doEdits : List comparable -> List comparable -> (List (EditStep comparable), Int)
 doEdits source target =
   case (source, target) of
     ([], []) ->
@@ -88,7 +94,7 @@ value into a single Move action with that value. (These are equivalent anyway,
 as a deletion and insertion elsewhere of a certain value is nothing more than a
 movement of that value.)
 -}
-reduceMoves : List (EditStep a) -> List (EditStep a)
+reduceMoves : List (EditStep comparable) -> List (EditStep comparable)
 reduceMoves editSteps =
   let
     findMove step acc =
@@ -117,7 +123,7 @@ reduceMoves editSteps =
 {-| Takes an edit step and a list of edit steps and returns either a move step
 if there is one to be found for that edit step, or Nothing if not.
 -}
-moveFromSteps : List (EditStep a) -> EditStep a -> Maybe (EditStep a)
+moveFromSteps : List (EditStep comparable) -> EditStep comparable -> Maybe (EditStep comparable)
 moveFromSteps editSteps step =
   case step of
     Insert value index ->
@@ -168,7 +174,7 @@ another.
     levenshtein (String.toList "garvey") (String.toList "avery")
       == 3
 -}
-levenshtein : List a -> List a -> Int
+levenshtein : List comparable -> List comparable -> Int
 levenshtein source target =
   case (source, target) of
     (source, []) ->
