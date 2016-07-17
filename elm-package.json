@@ -4,7 +4,8 @@
     "repository": "https://github.com/erwald/elm-edit-distance.git",
     "license": "MIT",
     "source-directories": [
-        "."
+        ".",
+        "src"
     ],
     "exposed-modules": [
         "EditDistance"
