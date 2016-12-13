@@ -93,7 +93,7 @@ Contributions are welcome. Just open up an issue if you've found a problem or ha
 
 ## Change Log
 
-### 1.1.0
+### 1.1.1
 
 * Update for Elm 0.18.
 
