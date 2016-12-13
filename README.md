@@ -95,6 +95,10 @@ Contributions are welcome. Just open up an issue if you've found a problem or ha
 
 ### 1.1.0
 
+* Update for Elm 0.18.
+
+### 1.1.0
+
 * Adds support for custom cost functions in the form of `editsWithCostFunc` and `editsWithCostFuncFromStrings`.
 
 ### 1.0.0
