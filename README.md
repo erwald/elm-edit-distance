@@ -61,28 +61,37 @@ Let's look at these steps in order, keeping in mind that deletions are made firs
 
 ## Tests
 
-First compile the tests:
+First install elm-test:
 
 ```sh
-$ cd tests
-
-$ elm-make Tests.elm
-Success! Compiled 0 modules.
-Successfully generated index.html
+$ npm install -g elm-test
 ```
 
-Then open up `index.html` and have a look at the console. It should say something like this:
+Then run the tests, and you should see something like this:
 
-```
-1 suites run, containing 26 tests
-All tests passed
+```sh
+$ elm-test
+Success! Compiled 1 module.
+Successfully generated /var/folders/kb/lmdz_h5n629b85bbnkxhfx3c0000gn/T/elm_test_1161113-40357-1bh5q3m.e262a3v7vi.js
+
+elm-test
+--------
+
+Running 26 tests. To reproduce these results, run: elm-test --seed 514474818
+
+
+TEST RUN PASSED
+
+Duration: 796 ms
+Passed:   26
+Failed:   0
 ```
 
 ## Contributing
 
 Contributions are welcome. Just open up an issue if you've found a problem or have a suggestion for a feature, or a pull request if you already know how to fix or implement it.
 
-## Changelog
+## Change Log
 
 ### 1.1.0
 

@@ -81,7 +81,7 @@ Int).
 converted into moves, meaning it will never receive an EditStep of type Move as
 an argument.)
 -}
-editsWithCostFunc : (EditStep a -> Int) -> List comparable -> List comparable -> List (EditStep comparable)
+editsWithCostFunc : (EditStep comparable -> Int) -> List comparable -> List comparable -> List (EditStep comparable)
 editsWithCostFunc costFunc source target =
     let
         ( result, _ ) =
