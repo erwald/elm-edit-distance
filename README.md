@@ -61,7 +61,7 @@ Let's look at these steps in order, keeping in mind that deletions are made firs
 
 ## Tests
 
-First install elm-test:
+First install [elm-test](http://package.elm-lang.org/packages/elm-community/elm-test/latest):
 
 ```sh
 $ npm install -g elm-test
