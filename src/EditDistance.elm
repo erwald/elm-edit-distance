@@ -13,10 +13,14 @@ module EditDistance
 between two lists, or the actual edit steps required to go from one to the
 other.
 
+
 # Edit Steps
+
 @docs EditStep, edits, editsFromStrings, editsWithCostFunc, editsWithCostFuncFromStrings
 
+
 # Levenshtein
+
 @docs levenshtein, levenshteinFromStrings
 
 -}
@@ -47,10 +51,11 @@ required to turn one given list into another.
       , Move 'r' 2 3
       ]
 
-The resulting indices reflect edits where _deletions are made first_, before
+The resulting indices reflect edits where *deletions are made first*, before
 insertions and substitutions. That is, indices for deletions refer to the source
 list, whereas indices for insertions and substitutions refer to the latter,
 intermediate lists.
+
 -}
 edits : List comparable -> List comparable -> List (EditStep comparable)
 edits source target =
@@ -77,9 +82,10 @@ Int).
       , Delete 'b' 1
       ]
 
-(Note that the cost function is applied _before_ insertions and deletions are
+(Note that the cost function is applied *before* insertions and deletions are
 converted into moves, meaning it will never receive an EditStep of type Move as
 an argument.)
+
 -}
 editsWithCostFunc : (EditStep comparable -> Int) -> List comparable -> List comparable -> List (EditStep comparable)
 editsWithCostFunc costFunc source target =
@@ -253,6 +259,7 @@ moveFromSteps editSteps step =
       [ Delete 'g' 0
       , Move 'r' 2 3
       ]
+
 -}
 editsFromStrings : String -> String -> List (EditStep Char)
 editsFromStrings source target =
@@ -276,6 +283,7 @@ editsFromStrings source target =
       [ Insert 'd' 1
       , Delete 'b' 1
       ]
+
 -}
 editsWithCostFuncFromStrings : (EditStep Char -> Int) -> String -> String -> List (EditStep Char)
 editsWithCostFuncFromStrings costFunc source target =
@@ -294,27 +302,113 @@ into another.
 
     levenshtein (String.toList "garvey") (String.toList "avery")
       == 3
+
 -}
 levenshtein : List comparable -> List comparable -> Int
-levenshtein source target =
-    case ( source, target ) of
-        ( source, [] ) ->
-            List.length source
+levenshtein text pattern =
+    case ( text, pattern ) of
+        ( [], _ ) ->
+            List.length pattern
 
-        ( [], target ) ->
-            List.length target
+        ( _, [] ) ->
+            List.length text
 
-        ( src_hd :: src_tail, tgt_hd :: tgt_tail ) ->
-            if src_hd == tgt_hd then
-                levenshtein src_tail tgt_tail
+        ( [ t1 ], _ ) ->
+            if List.any ((==) t1) pattern then
+                List.length pattern - 1
             else
-                Maybe.withDefault 0
-                    (List.minimum
-                        [ (levenshtein src_tail target) + 1
-                        , (levenshtein source tgt_tail) + 1
-                        , (levenshtein src_tail tgt_tail) + 1
-                        ]
-                    )
+                List.length pattern
+
+        ( _, [ p1 ] ) ->
+            if List.any ((==) p1) text then
+                List.length text - 1
+            else
+                List.length text
+
+        ( t1 :: t2 :: tTail, p1 :: p2 :: pTail ) ->
+            if t1 == p1 then
+                levenshtein (t2 :: tTail) (p2 :: pTail)
+            else if t1 == p2 then
+                levenshtein (t2 :: tTail) (p1 :: pTail)
+            else if t2 == p1 then
+                levenshtein (t1 :: tTail) (p2 :: pTail)
+            else if t2 == p2 then
+                levenshtein (t1 :: tTail) (p1 :: pTail)
+            else
+                initTextLoop text pattern
+
+
+hdOrZero : List Int -> Int
+hdOrZero lst =
+    case lst of
+        hd :: tl ->
+            hd
+
+        [] ->
+            0
+
+
+tlOrEmpty : List a -> List a
+tlOrEmpty lst =
+    case lst of
+        hd :: tl ->
+            tl
+
+        [] ->
+            []
+
+
+patternLoop : comparable -> List comparable -> Int -> List Int -> List Int
+patternLoop tChar pattern b0 prevCol =
+    let
+        recLoop : List comparable -> Int -> Int -> Int -> Int -> List Int -> List Int -> List Int
+        recLoop pattern idx b0 b1 b2 prevCol revCurCol =
+            case pattern of
+                pChar :: pTail ->
+                    let
+                        b0_ : Int
+                        b0_ =
+                            b1
+
+                        b1_ : Int
+                        b1_ =
+                            hdOrZero prevCol
+
+                        b2_ : Int
+                        b2_ =
+                            if pChar == tChar then
+                                b0
+                            else
+                                1 + (min b1 b2 |> min b0)
+                    in
+                        recLoop pTail (idx + 1) b0_ b1_ b2_ (tlOrEmpty prevCol) (b2_ :: revCurCol)
+
+                [] ->
+                    revCurCol
+    in
+        recLoop pattern 1 b0 (hdOrZero prevCol) (b0 + 1) (tlOrEmpty prevCol) []
+
+
+textLoop : List comparable -> List comparable -> Int -> List Int -> List Int
+textLoop text pattern idx revCol =
+    case text of
+        tChar :: tTail ->
+            List.reverse revCol
+                |> patternLoop tChar pattern (idx - 1)
+                |> textLoop tTail pattern (idx + 1)
+
+        [] ->
+            revCol
+
+
+initTextLoop : List comparable -> List comparable -> Int
+initTextLoop text pattern =
+    let
+        initCol : List Int
+        initCol =
+            List.range 1 (List.length pattern) |> List.reverse
+    in
+        textLoop text pattern 1 initCol |> hdOrZero
 
 
 {-| Same as the `levenshtein` function, but for String values.
@@ -324,6 +418,7 @@ levenshtein source target =
     levenshtein "preterit" "zeitgeist" == 6
 
     levenshtein "garvey" "avery" == 3
+
 -}
 levenshteinFromStrings : String -> String -> Int
 levenshteinFromStrings source target =
