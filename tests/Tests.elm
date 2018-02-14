@@ -91,7 +91,7 @@ all =
                     Expect.equal (edits abc adc)
                         [ Substitute 'd' 1
                         ]
-            , test "abc -> adc (without cost function) edit steps" <|
+            , test "abc -> adc (with cost function) edit steps" <|
                 \() ->
                     let
                         costFunc editStep =
@@ -170,6 +170,18 @@ all =
         , describe "when getting Levenshtein distance between strings"
             [ test "kitten <-> sitting Levenshtein distance" <|
                 \() -> Expect.equal (levenshteinFromStrings "kitten" "sitting") 3
+            , test "a <-> abc Levenshtein distance" <|
+                \() -> Expect.equal (levenshteinFromStrings "a" "abc") 2
+            , test "abc <-> a Levenshtein distance" <|
+                \() -> Expect.equal (levenshteinFromStrings "abc" "a") 2
+            , test "ab <-> abc Levenshtein distance" <|
+                \() -> Expect.equal (levenshteinFromStrings "ab" "abc") 1
+            , test "abc <-> ab Levenshtein distance" <|
+                \() -> Expect.equal (levenshteinFromStrings "abc" "ab") 1
+            , test "a <-> xyz Levenshtein distance" <|
+                \() -> Expect.equal (levenshteinFromStrings "a" "xyz") 3
+            , test "xyz <-> a Levenshtein distance" <|
+                \() -> Expect.equal (levenshteinFromStrings "xyz" "a") 3
             , test "sitting <-> kitten Levenshtein distance" <|
                 \() -> Expect.equal (levenshteinFromStrings "sitting" "kitten") 3
             , test "kitten <-> empty string Levenshtein distance" <|
