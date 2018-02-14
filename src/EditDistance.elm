@@ -328,12 +328,8 @@ levenshtein text pattern =
         ( t1 :: t2 :: tTail, p1 :: p2 :: pTail ) ->
             if t1 == p1 then
                 levenshtein (t2 :: tTail) (p2 :: pTail)
-            else if t1 == p2 then
-                levenshtein (t2 :: tTail) (p1 :: pTail)
-            else if t2 == p1 then
-                levenshtein (t1 :: tTail) (p2 :: pTail)
             else if t2 == p2 then
-                levenshtein (t1 :: tTail) (p1 :: pTail)
+                1 + levenshtein tTail pTail
             else
                 initTextLoop text pattern
 
