@@ -305,33 +305,31 @@ into another.
 
 -}
 levenshtein : List comparable -> List comparable -> Int
-levenshtein text pattern =
-    case ( text, pattern ) of
+levenshtein source target =
+    case ( source, target ) of
         ( [], _ ) ->
-            List.length pattern
+            List.length target
 
         ( _, [] ) ->
-            List.length text
+            List.length source
 
-        ( [ t1 ], _ ) ->
-            if List.any ((==) t1) pattern then
-                List.length pattern - 1
+        ( [ src ], _ ) ->
+            if List.any ((==) src) target then
+                List.length target - 1
             else
-                List.length pattern
+                List.length target
 
-        ( _, [ p1 ] ) ->
-            if List.any ((==) p1) text then
-                List.length text - 1
+        ( _, [ tgt ] ) ->
+            if List.any ((==) tgt) source then
+                List.length source - 1
             else
-                List.length text
+                List.length source
 
-        ( t1 :: t2 :: tTail, p1 :: p2 :: pTail ) ->
-            if t1 == p1 then
-                levenshtein (t2 :: tTail) (p2 :: pTail)
-            else if t2 == p2 then
-                1 + levenshtein tTail pTail
+        ( src_hd :: src_tail, tgt_hd :: tgt_tail ) ->
+            if src_hd == tgt_hd then
+                levenshtein src_tail tgt_tail
             else
-                initTextLoop text pattern
+                initTextLoop source target
 
 
 hdOrZero : List Int -> Int
