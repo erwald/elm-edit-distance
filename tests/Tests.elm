@@ -91,7 +91,7 @@ all =
                     Expect.equal (edits abc adc)
                         [ Substitute 'd' 1
                         ]
-            , test "abc -> adc (without cost function) edit steps" <|
+            , test "abc -> adc (with cost function) edit steps" <|
                 \() ->
                     let
                         costFunc editStep =
