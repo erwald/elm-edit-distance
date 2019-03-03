@@ -130,7 +130,7 @@ doEdits costFunc source target =
                         , doEdits costFunc src_tail tgt_tail
                         ]
 
-                    edits =
+                    editsList =
                         [ Delete src_hd (List.length src_tail)
                         , Insert tgt_hd (List.length tgt_tail)
                         , Substitute tgt_hd (List.length tgt_tail)
@@ -142,7 +142,7 @@ doEdits costFunc source target =
                     getCost ( _, cost ) =
                         cost
                 in
-                    List.map2 combineResultsWithEdits results edits
+                    List.map2 combineResultsWithEdits results editsList
                         |> List.sortBy getCost
                         |> List.head
                         |> Maybe.withDefault ( [], 0 )
@@ -194,8 +194,8 @@ moveFromSteps editSteps step =
         Insert value index ->
             let
                 -- Find the corresponding deletion, if there is one.
-                isCorrespondingDelete step =
-                    case step of
+                isCorrespondingDelete s =
+                    case s of
                         Delete otherValue _ ->
                             value == otherValue
 
@@ -217,8 +217,8 @@ moveFromSteps editSteps step =
         Delete value index ->
             let
                 -- Find the corresponding insertion, if there is one.
-                isCorrespondingInsert step =
-                    case step of
+                isCorrespondingInsert s =
+                    case s of
                         Insert otherValue _ ->
                             value == otherValue
 
@@ -298,11 +298,11 @@ into another.
 levenshtein : List comparable -> List comparable -> Int
 levenshtein source target =
     case ( source, target ) of
-        ( source, [] ) ->
+        ( s, [] ) ->
             List.length source
 
-        ( [], target ) ->
-            List.length target
+        ( [], t ) ->
+            List.length t
 
         ( src_hd :: src_tail, tgt_hd :: tgt_tail ) ->
             if src_hd == tgt_hd then
